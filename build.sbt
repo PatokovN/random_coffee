@@ -57,6 +57,6 @@ lazy val `auth-service` =
 
 lazy val `rc-events-service` =
   (project in file("rc-events-service")).settings(
-    libraryDependencies ++= akkaHttpBase +: (baseTest ++ akkaHttpTest),
+    libraryDependencies ++= akkaHttpJson +: jwtCore +: liquibase +: (akkaHttp ++ circe ++ doobie ++ logging ++ baseTest ++ akkaHttpTest),
     commonSettings
   )
