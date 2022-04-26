@@ -8,7 +8,7 @@ import pureconfig.ConfigReader
 import pureconfig.generic.auto.exportReader
 import pureconfig.generic.semiauto.deriveReader
 
-final case class RandomCoffeeConfig(authentication: AuthenticationServiceConfig,eventServiceConfig: EventServiceConfig)
+final case class RandomCoffeeConfig(authentication: AuthenticationServiceConfig, eventServiceConfig: EventServiceConfig)
 
 object RandomCoffeeConfig {
 

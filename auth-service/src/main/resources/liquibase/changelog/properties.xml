@@ -13,5 +13,6 @@
     <property name="timestamp.type" value="TIMESTAMP" dbms="postgresql"/>
     <property name="integer.type" value="INTEGER" dbms="postgresql"/>
     <property name="json.type" value="jsonb" dbms="postgresql"/>
+    <property name="serial.type" value="serial" dbms="postgresql"/>
 
 </databaseChangeLog>

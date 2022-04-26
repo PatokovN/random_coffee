@@ -3,40 +3,25 @@ package com.epam.random_coffee.events.api
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.epam.random_coffee.events.api.codecs.EventCodecs
-import com.epam.random_coffee.events.api.request.{CreateEventRequest, DeleteEventRequest, FindEventRequest, UpdateEventRequest}
-import com.epam.random_coffee.events.api.response.{CreateEventResponse, DeleteEventResponse, FindEventResponse, UpdateEventResponse}
+import com.epam.random_coffee.events.api.request.{ CreateEventRequest, UpdateEventRequest }
 import com.epam.random_coffee.events.services.EventService
 
 class RcEventsAPI(eventService: EventService) extends EventCodecs {
 
-  def routes: Route = pathPrefix("events" / "v1")(create ~ delete ~ find ~ update)
+  def routes: Route = pathPrefix("v1" / "events")(createEvent ~ deleteEvent ~ getEvent ~ updateEvent)
 
-  private lazy val create: Route =
-    (path("create") & post & entity(as[CreateEventRequest])) { request =>
-      onSuccess(eventService.create(request.event)){status =>
-        complete(CreateEventResponse(status))
-      }
-    }
+  private lazy val createEvent: Route =
+    (post & entity(as[CreateEventRequest]))(request => complete(eventService.create(request)))
 
-  private lazy val delete: Route =
-    (path("delete") & post & entity(as[DeleteEventRequest])) { request =>
-      onSuccess(eventService.remove(request.event)) { status =>
-        complete(DeleteEventResponse(status, "deleted"))
-      }
-    }
+  private lazy val deleteEvent: Route =
+    (path(IntNumber) & delete)(id => complete(eventService.delete(id)))
 
-  private lazy val find: Route =
-    (path("find") & post & entity(as[FindEventRequest])) { request =>
-      onSuccess(eventService.find(request.event)) {status =>
-        complete(FindEventResponse(if (status.isDefined)"found " else "Not found",status))
-      }
-    }
+  private lazy val getEvent: Route =
+    (path(IntNumber) & get)(id => complete(eventService.find(id)))
 
-  private lazy val update: Route =
-    (path("update") & post & entity(as[UpdateEventRequest])) {request =>
-      onSuccess(eventService.updateEvent(request.oldEvent,request.newEvent)) {status =>
-        complete(UpdateEventResponse(request.oldEvent, "replaced by",status))
-      }
+  private lazy val updateEvent: Route =
+    (path(IntNumber) & put & entity(as[UpdateEventRequest])) { (id, event) =>
+      complete(eventService.updateEvent(id, event))
     }
 
 }

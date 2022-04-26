@@ -4,13 +4,14 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import com.epam.random_coffee.events.config.DbConfig
 import com.epam.random_coffee.events.repo.impl.EventRepositoryImpl
-import com.epam.random_coffee.events.repo.{EventRepository, LiquibaseMigrator}
+import com.epam.random_coffee.events.repo.{ EventRepository, LiquibaseMigrator }
 import com.zaxxer.hikari.HikariDataSource
 import doobie.Transactor
+
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
 
-class RepositoryDI(db: DbConfig)(implicit runtime: IORuntime){
+class RepositoryDI(db: DbConfig)(implicit runtime: IORuntime) {
 
   lazy val eventRepository: EventRepository = new EventRepositoryImpl(transactor)
 

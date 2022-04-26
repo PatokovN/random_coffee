@@ -1,15 +1,18 @@
 package com.epam.random_coffee.events.services
 
+import com.epam.random_coffee.events.api.request.{ CreateEventRequest, UpdateEventRequest }
+import com.epam.random_coffee.events.api.response.EventResponse
 import com.epam.random_coffee.events.model.Event
+
 import scala.concurrent.Future
 
 trait EventService {
 
-  def create (event: Event): Future[Event]
+  def create(event: CreateEventRequest): Future[EventResponse]
 
-  def find (event: Event): Future[Option[Event]]
+  def find(id: Int): Future[Option[Event]]
 
-  def updateEvent (oldEventName: Event, newEventName: Event): Future[Event]
+  def updateEvent(id: Int, event: UpdateEventRequest): Future[EventResponse]
 
-  def remove (event: Event): Future[Event]
+  def delete(id: Int): Future[Unit]
 }

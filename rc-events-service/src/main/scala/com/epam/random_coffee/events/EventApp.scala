@@ -4,12 +4,12 @@ import akka.http.scaladsl.server.Route
 import cats.effect.unsafe.IORuntime
 import com.epam.random_coffee.events.api.RcEventsAPI
 import com.epam.random_coffee.events.config.EventServiceConfig
-import com.epam.random_coffee.events.di.{RepositoryDI, ServiceDI}
+import com.epam.random_coffee.events.di.{ RepositoryDI, ServiceDI }
 
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-class EventApp (config: EventServiceConfig) {
+class EventApp(config: EventServiceConfig) {
   def init: Try[Unit] = repositoryDI.liquibaseMigrator.runMigrations(config.liquibase.changelogPath)
 
   def api: Try[Route] = Try(apiDI.routes)

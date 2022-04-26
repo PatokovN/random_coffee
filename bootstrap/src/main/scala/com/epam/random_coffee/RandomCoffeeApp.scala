@@ -12,7 +12,7 @@ import com.epam.random_coffee.events.config.EventServiceConfig
 import pureconfig.ConfigSource
 import pureconfig.error.ConfigReaderException
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 object RandomCoffeeApp extends App {
 
@@ -21,7 +21,7 @@ object RandomCoffeeApp extends App {
   private def loadConfig(): Try[RandomCoffeeConfig] =
     ConfigSource.default.load[RandomCoffeeConfig].left.map(ConfigReaderException[RandomCoffeeConfig](_)).toTry
 
-    private def loadAuthenticationApi(config: AuthenticationServiceConfig): Try[Route] = {
+  private def loadAuthenticationApi(config: AuthenticationServiceConfig): Try[Route] = {
     val authenticationApp = new AuthenticationApp(config)
     authenticationApp.init.flatMap(_ => authenticationApp.api)
   }

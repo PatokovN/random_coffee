@@ -1,14 +1,19 @@
 package com.epam.random_coffee.events.repo
 
+import com.epam.random_coffee.events.api.request.UpdateEventRequest
+import com.epam.random_coffee.events.api.response.EventResponse
 import com.epam.random_coffee.events.model.Event
+
 import scala.concurrent.Future
 
 trait EventRepository {
-  def save (event: Event): Future[Unit]
+  def save(eventName: String): Future[Unit]
 
-  def find (event: Event): Future[Option[Event]]
+  def findByName(eventName: String): Future[Option[EventResponse]]
 
-  def refresh (oldEvent: Event, newEvent: Event): Future[Unit]
+  def findById(id: Int): Future[Option[Event]]
 
-  def delete (event: Event): Future[Unit]
+  def refresh(id: Int, newEventName: UpdateEventRequest): Future[Unit]
+
+  def delete(id: Int): Future[Unit]
 }

@@ -1,49 +1,50 @@
 package com.epam.random_coffee.events.services.impl
 
+import com.epam.random_coffee.events.api.request.{ CreateEventRequest, UpdateEventRequest }
+import com.epam.random_coffee.events.api.response.EventResponse
 import com.epam.random_coffee.events.model.Event
 import com.epam.random_coffee.events.repo.EventRepository
 import com.epam.random_coffee.events.services.EventService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
-class EventServiceImpl(repo: EventRepository)(implicit ec: ExecutionContext) extends EventService{
+class EventServiceImpl(repo: EventRepository)(implicit ec: ExecutionContext) extends EventService {
 
-  override def create (event: Event): Future[Event] =
+  override def create(request: CreateEventRequest): Future[EventResponse] =
     for {
-      existingEvent <- repo.find(event)
-      _ <- existingEvent.fold(Future.unit)(_ => duplicateEventErr(event))
-      _ <- save(event)
-    } yield event
+      existingEvent <- repo.findByName(request.eventName)
+      _ <- existingEvent.fold(Future.unit)(_ => duplicateEventErr(request.eventName))
+      _ <- repo.save(request.eventName)
+      responseEvent <- repo.findByName(request.eventName)
+      response = responseEvent.get
+    } yield response
 
-  private def save(event: Event): Future[Unit] = repo.save(event)
-
-  override def find(event: Event): Future[Option[Event]] = repo.find(event)
-
-  override def remove(event: Event): Future[Event] =
+  override def find(id: Int): Future[Option[Event]] =
     for {
-      existingEvent <- repo.find(event)
-      _ <- existingEvent.fold(absentEventErr(event))(_ => Future.unit)
-      _ <- delete(event)
-    } yield event
+      notVerifiedEvent <- repo.findById(id)
+      _ <- notVerifiedEvent.fold(absentEventErr(id))(_ => Future.unit)
+      verifiedEvent = notVerifiedEvent
+    } yield verifiedEvent
 
-  private def delete(event: Event): Future[Unit] = repo.delete(event)
-
-  override def updateEvent(oldEventName: Event, newEventName: Event): Future[Event] =
+  override def delete(id: Int): Future[Unit] =
     for {
-      existingEvent <- repo.find(oldEventName)
-      _ <- existingEvent.fold(absentEventErr(oldEventName))(_ => Future.unit)
-      _ <- refresh(oldEventName, newEventName)
-    } yield newEventName
+      existingEvent <- repo.findById(id)
+      nothing <- existingEvent.fold(absentEventErr(id))(_ => Future.unit)
+      _ <- repo.delete(id)
+    } yield nothing
 
-   def refresh(oldEventName: Event, newEventName: Event): Future[Unit] = {
+  override def updateEvent(id: Int, newEventName: UpdateEventRequest): Future[EventResponse] =
+    for {
+      existingEvent <- repo.findById(id)
+      _ <- existingEvent.fold(absentEventErr(id))(_ => Future.unit)
+      _ <- repo.refresh(id, newEventName)
+      response = EventResponse(id, newEventName.eventName)
+    } yield response
 
-    repo.refresh(oldEventName,newEventName)
-  }
+  private def duplicateEventErr(event: String): Future[Unit] =
+    Future.failed(new IllegalArgumentException(s"Event $event already exists"))
 
-  private def duplicateEventErr(event: Event): Future[Unit] =
-  Future.failed(new IllegalArgumentException(s"Event ${event.eventName} already exists"))
-
-  private def absentEventErr(event: Event): Future[Unit] =
-  Future.failed(new IllegalArgumentException(s"Event ${event.eventName} doesn't exist"))
+  private def absentEventErr(id: Int): Future[Unit] =
+    Future.failed(new IllegalArgumentException(s"Event with id № $id doesn't exist"))
 
 }
