@@ -34,12 +34,11 @@ object RandomCoffeeApp extends App {
     for {
       config <- loadConfig()
       authRoutes <- loadAuthenticationApi(config.authentication)
-      rcEventsRoutes <- loadEventApi(config.eventServiceConfig)
+      rcEventsRoutes <- loadEventApi(config.eventService)
     } yield {
       val route = Route.seal(authRoutes ~ rcEventsRoutes)
 
       // todo take values from a config
-
       val interface = "localhost"
       val port = 8088
       Http().newServerAt(interface, port).bind(route)

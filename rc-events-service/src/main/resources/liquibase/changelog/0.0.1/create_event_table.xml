@@ -8,10 +8,11 @@
 
     <changeSet id="create_event_table" author="patokov">
         <createTable tableName="event">
-            <column name="id" type="${serial.type}"/>
+            <column name="id" type="${uuid.type}"/>
             <column name="name" type="${64_length_text.type}"/>
         </createTable>
-        <addUniqueConstraint constraintName="event_name_unq" tableName="event" columnNames="name"/>
+        <addPrimaryKey constraintName="event_pk" tableName="event" columnNames="id"/>
+        <addNotNullConstraint constraintName="event_name_nn" tableName="event" columnName= "name"/>
     </changeSet>
 
 </databaseChangeLog>

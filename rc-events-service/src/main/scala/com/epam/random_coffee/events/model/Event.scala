@@ -1,3 +1,5 @@
 package com.epam.random_coffee.events.model
 
-case class Event(id: Int, eventName: String)
+final case class Event(id: EventId, eventName: String)
+
+final case class EventId(value: String) extends AnyVal

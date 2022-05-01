@@ -1,8 +1,6 @@
 package com.epam.random_coffee.events.services
 
-import com.epam.random_coffee.events.api.request.{ CreateEventRequest, UpdateEventRequest }
-import com.epam.random_coffee.events.api.response.EventResponse
-import com.epam.random_coffee.events.model.Event
+import com.epam.random_coffee.events.model.{ Event, EventId }
 import com.epam.random_coffee.events.repo.EventRepository
 import com.epam.random_coffee.events.services.impl.EventServiceImpl
 import org.scalamock.scalatest.AsyncMockFactory
@@ -15,86 +13,70 @@ class EventServiceImplSpec extends AsyncWordSpec with AsyncMockFactory with OneI
   private val repo = mock[EventRepository]
   private val service = new EventServiceImpl(repo)
 
-  private val id = 1
+  private val id = EventId("uuid_test")
   private val event = Event(id, "created_event")
-  private val createRequest = CreateEventRequest("created_event")
-  private val updateRequest = UpdateEventRequest("updated_event")
-  private val eventResponseForCreate = EventResponse(id, "created_event")
 
   "EventService" should {
 
     "create an event" when {
       "event doesn't exist" in {
-        (repo.findByName _).expects(createRequest.eventName).returns(Future.successful(None))
+        (repo.save _).expects(*).returns(Future.unit)
 
-        (repo.save _).expects(createRequest.eventName).returns(Future.unit)
-
-        (repo.findByName _).expects(createRequest.eventName).returns(Future.successful(Some(eventResponseForCreate)))
-
-        service.create(createRequest).map(_ => succeed)
+        service.create(event.eventName).map(_ => succeed)
       }
     }
 
     "delete an event" when {
       "event exists" in {
-        (repo.findById _).expects(id).returns(Future.successful(Some(event)))
+        (repo.find _).expects(id).returns(Future.successful(Some(event)))
 
         (repo.delete _).expects(*).returns(Future.unit)
 
-        service.delete(id).map(_ => succeed)
+        service.delete(id.value).map(_ => succeed)
       }
     }
 
     "update an event" when {
       "event exists" in {
-        (repo.findById _).expects(id).returns(Future.successful(Some(event)))
+        (repo.find _).expects(id).returns(Future.successful(Some(event)))
 
-        (repo.refresh _).expects(*, *).returns(Future.unit)
+        (repo.update _).expects(*, *).returns(Future.unit)
 
-        service.updateEvent(id, updateRequest).map(_ => succeed)
+        service.update(id.value, event.eventName).map(_ => succeed)
       }
     }
 
     "find an event" when {
       "there is an event in repo" in {
-        (repo.findById _).expects(id).returns(Future.successful(Some(event)))
+        (repo.find _).expects(id).returns(Future.successful(Some(event)))
 
-        service.find(id).map(testEvent => assert(testEvent.contains(event)))
-      }
-    }
-
-    "fail to create an event" when {
-
-      "such event already exists" in {
-        (repo.findByName _).expects("created_event").returns(Future.successful(Some(eventResponseForCreate)))
-
-        service
-          .create(createRequest)
-          .failed
-          .map(_.getMessage)
-          .map(msg => assert(msg == s"Event ${createRequest.eventName} already exists"))
+        service.find(id.value).map(testEvent => assert(testEvent.contains(event)))
       }
     }
 
     "fail to delete an event" when {
 
       "such event doesn't exists" in {
-        (repo.findById _).expects(id).returns(Future.successful(None))
+        (repo.find _).expects(id).returns(Future.successful(None))
 
-        service.delete(id).failed.map(_.getMessage).map(msg => assert(msg == s"Event with id № $id doesn't exist"))
+        service
+          .delete(id.value)
+          .failed
+          .map(_.getMessage)
+          .map(msg => assert(msg == s"Event with id ${id.value} doesn't exist"))
       }
     }
 
     "fail to update an event" when {
 
       "such event doesn't exists" in {
-        (repo.findById _).expects(id).returns(Future.successful(None))
+        (repo.find _).expects(id).returns(Future.successful(None))
 
         service
-          .updateEvent(id, updateRequest)
+          .update(id.value, event.eventName)
           .failed
           .map(_.getMessage)
-          .map(msg => assert(msg == s"Event with id № $id doesn't exist"))
+          .map(msg => assert(msg == s"Event with id ${id.value} doesn't exist"))
       }
     }
   }
