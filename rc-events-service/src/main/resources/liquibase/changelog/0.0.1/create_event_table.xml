@@ -12,7 +12,7 @@
             <column name="name" type="${64_length_text.type}"/>
         </createTable>
         <addPrimaryKey constraintName="event_pk" tableName="event" columnNames="id"/>
-        <addNotNullConstraint constraintName="event_name_nn" tableName="event" columnName= "name"/>
+        <addNotNullConstraint constraintName="event_name_nn" tableName="event" columnName="name"/>
     </changeSet>
 
 </databaseChangeLog>

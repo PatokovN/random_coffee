@@ -50,13 +50,24 @@ lazy val bootstrap = project
   .dependsOn(`auth-service`, `rc-events-service`)
 
 lazy val `auth-service` =
-  (project in file("auth-service")).settings(
-    libraryDependencies ++= akkaHttpJson +: jwtCore +: liquibase +: (akkaHttp ++ circe ++ doobie ++ logging ++ baseTest ++ akkaHttpTest),
-    commonSettings
-  )
+  (project in file("auth-service"))
+    .settings(
+      libraryDependencies ++= akkaHttpJson +: jwtCore +: liquibase +: (akkaHttp ++ circe ++ doobie ++ logging ++ baseTest ++ akkaHttpTest),
+      commonSettings
+    )
+    .aggregate(`lb_migrator`)
+    .dependsOn(`lb_migrator`)
 
 lazy val `rc-events-service` =
-  (project in file("rc-events-service")).settings(
-    libraryDependencies ++= akkaHttpJson +: jwtCore +: liquibase +: (akkaHttp ++ circe ++ doobie ++ logging ++ baseTest ++ akkaHttpTest),
+  (project in file("rc-events-service"))
+    .settings(
+      libraryDependencies ++= akkaHttpJson +: jwtCore +: liquibase +: (akkaHttp ++ circe ++ doobie ++ logging ++ baseTest ++ akkaHttpTest),
+      commonSettings
+    )
+    .aggregate(`lb_migrator`)
+    .dependsOn(`lb_migrator`)
+lazy val `lb_migrator` =
+  (project in file("lb_migrator")).settings(
+    libraryDependencies ++= liquibase +: logging,
     commonSettings
   )

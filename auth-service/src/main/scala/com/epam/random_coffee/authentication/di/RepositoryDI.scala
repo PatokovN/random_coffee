@@ -4,7 +4,8 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import com.epam.random_coffee.authentication.config.DbConfig
 import com.epam.random_coffee.authentication.repository.impl.UserRepositoryDoobieImpl
-import com.epam.random_coffee.authentication.repository.{ LiquibaseMigrator, UserRepository }
+import com.epam.random_coffee.authentication.repository.UserRepository
+import com.epam.random_coffee.l_b_migrator.LiquibaseMigrator
 import com.zaxxer.hikari.HikariDataSource
 import doobie.Transactor
 

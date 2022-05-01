@@ -1,4 +1,4 @@
-package com.epam.random_coffee.events.repo
+package com.epam.random_coffee.l_b_migrator
 
 import com.typesafe.scalalogging.StrictLogging
 import liquibase.database.DatabaseFactory
